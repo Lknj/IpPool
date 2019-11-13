@@ -105,5 +105,6 @@ class Proxies(object):
 
 
 if __name__ == '__main__':
-    ceshi = Proxies()
-    ceshi.verify_proxies()
+    # ceshi = Proxies()
+    # ceshi.verify_proxies()
+    pass

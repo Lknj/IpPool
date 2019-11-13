@@ -1,4 +1,3 @@
-import SQLTool
 # 关于数据库
 
 host = 'localhost'
