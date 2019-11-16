@@ -29,8 +29,6 @@ class MySQL(object):
             result = self.cursor.fetchall()
         except Exception as e:
             raise e
-        self.cursor.close()
-        self.db.close()
 
         return result
 
@@ -54,8 +52,6 @@ class MySQL(object):
 
             except Exception as e:
                 raise e
-        self.cursor.close()
-        self.db.close()
 
     def update(self, sql, args):
         '''
@@ -77,8 +73,6 @@ class MySQL(object):
 
             except Exception as e:
                 raise e
-        self.cursor.close()
-        self.db.close()
 
     def delete(self, sql, args):
         '''
@@ -93,8 +87,3 @@ class MySQL(object):
 
         except Exception as e:
             raise e
-        self.cursor.close()
-        self.db.close()
-
-
-

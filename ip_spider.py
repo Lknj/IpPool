@@ -1,12 +1,11 @@
 # *-* coding:utf-8 *-*
 import requests
+import re
 from bs4 import BeautifulSoup
-import lxml
+from lxml import etree
 from multiprocessing import Process, Queue
-import random
-import json
-import time
 import SQLTool
+
 
 MySql = SQLTool.MySQL()
 
@@ -27,6 +26,7 @@ class Proxies(object):
         }
         self.get_proxies()
         self.get_proxies_nn()
+        self.get_proxies_zdy()
 
     def get_proxies(self):
         page = 1
@@ -53,6 +53,33 @@ class Proxies(object):
                 protocol = odd.find_all('td')[5].get_text().lower() + '://'
                 self.proxies.append(protocol + ':'.join([x.get_text() for x in odd.find_all('td')[1:3]]))
             page += 1
+
+    def get_proxies_zdy(self):
+        '''
+        爬取站大爷免费ip
+        :return:
+        '''
+        home_url = 'https://www.zdaye.com/dayProxy.html'
+        requests.packages.urllib3.disable_warnings()  # 取消警告
+        html = etree.HTML(
+            requests.get(home_url, headers=self.headers, verify=False).text,
+            parser=etree.HTMLParser(encoding='utf-8')
+        )
+        init_url = html.xpath('//*[@id="J_posts_list"]/div[2]/div/h3/a/@href')[0]
+        number = int(str(init_url).split('.')[0].split('/')[-1])
+        for i in range(24):
+            url = 'https://www.zdaye.com/dayProxy/ip/{}.html'.format(number)
+            ip_html = etree.HTML(
+                requests.get(url, headers=self.headers, verify=False).text,
+                parser=etree.HTMLParser(encoding='utf-8')
+            )
+            ip_result = ip_html.xpath('//*[@id="J_posts_list"]/div[3]/text()')
+            for proxy in ip_result:
+                ip, protocol = proxy.split('#')[0].split('@')
+                print('://'.join([protocol.lower(), ip]))
+                self.proxies.append('://'.join([protocol.lower(), ip]))
+            number -= 1
+
 
     def verify_proxies(self):
         # 没验证的代理
@@ -102,9 +129,3 @@ class Proxies(object):
                     new_queue.put((protocol, proxy))
             except:
                 print('fail %s' % proxy)
-
-
-if __name__ == '__main__':
-    # ceshi = Proxies()
-    # ceshi.verify_proxies()
-    pass
